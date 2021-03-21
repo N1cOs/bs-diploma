@@ -10,3 +10,6 @@ venv/
 # Editors
 .vscode
 .idea/
+
+# NN Weights
+*.weights
