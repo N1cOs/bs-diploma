@@ -6,7 +6,7 @@ from os import path
 
 import cv2
 
-from lib import darknet
+from lib import darknet, view
 
 
 @dataclasses.dataclass
@@ -61,6 +61,7 @@ if __name__ == "__main__":
 
     net = darknet.Network.from_config(args.config)
     net.load_weights(args.weights)
+    detector = darknet.ObjectDetector(net)
 
     classes = []
     with open(args.classes, "r") as f:
@@ -68,7 +69,7 @@ if __name__ == "__main__":
             line = line.strip()
             if line:
                 classes.append(line)
-    detector = darknet.ObjectDetector(net)
+    detection_writer = view.DetectionWriter(classes)
 
     cap = cv2.VideoCapture(args.in_video)
     stats = VideoStat.from_video_capture(cap)
@@ -90,11 +91,7 @@ if __name__ == "__main__":
 
             detections = detector.detect(frame)
             for detection in detections:
-                p1 = (int(detection.x1), int(detection.y1))
-                p2 = (int(detection.x2), int(detection.y2))
-                # ToDo: use separate color for each class
-                color = (255, 0, 0)
-                cv2.rectangle(frame, p1, p2, color)
+                detection_writer.write_detection(frame, detection)
 
             writer.write(frame)
             frames += 1
