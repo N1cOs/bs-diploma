@@ -6,7 +6,7 @@ from os import path
 
 import cv2
 
-import darknet
+from lib import darknet
 
 
 @dataclasses.dataclass
