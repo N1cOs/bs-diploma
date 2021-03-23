@@ -46,10 +46,10 @@ def print_progress(frames: int, all_frames: int, start: datetime.datetime):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--config", default="data/yolov3.cfg")
-    parser.add_argument("-w", "--weights", default="data/yolov3.weights")
-    parser.add_argument("-l", "--classes", default="data/coco.names")
-    parser.add_argument("-i", "--in-video", default="data/video_15s.mp4")
+    parser.add_argument("-c", "--config", default=path.join("data", "yolov3.cfg"))
+    parser.add_argument("-w", "--weights", default=path.join("data", "yolov3.weights"))
+    parser.add_argument("-l", "--classes", default=path.join("data", "coco.names"))
+    parser.add_argument("-i", "--in-video", default=path.join("data", "video_15s.mp4"))
     parser.add_argument("-o", "--out-video", default="")
     args = parser.parse_args()
 
