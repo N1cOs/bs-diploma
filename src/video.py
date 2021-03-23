@@ -68,7 +68,7 @@ if __name__ == "__main__":
             line = line.strip()
             if line:
                 classes.append(line)
-    detector = darknet.ObjectDetector(net, classes)
+    detector = darknet.ObjectDetector(net)
 
     cap = cv2.VideoCapture(args.in_video)
     stats = VideoStat.from_video_capture(cap)

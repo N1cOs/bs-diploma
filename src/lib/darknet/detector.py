@@ -6,20 +6,20 @@ import torch
 from torchvision import ops
 from torchvision import transforms as tr
 
+from lib import view
 from . import network
 
 
 class ObjectDetector:
-    def __init__(self, net: network.Network, classes: List[str]):
+    def __init__(self, net: network.Network):
         net.eval()
         self.net = net
-        self.classes = classes
         # ToDo: get value from network definition
         self.img_shape = ImageShape(416, 416)
 
     def detect(
         self, img: np.ndarray, conf_threshold: float = 0.5, iou_threshold: float = 0.4
-    ) -> List["DetectionResult"]:
+    ) -> List[view.DetectionResult]:
         transforms = tr.Compose(
             [
                 tr.ToTensor(),
@@ -53,14 +53,9 @@ class ObjectDetector:
 
             for obj in objects:
                 obj = [o.item() for o in obj]
-
-                clazz_i = int(obj[5])
-                try:
-                    clazz = self.classes[clazz_i]
-                except IndexError:
-                    raise ValueError(f"unknown class with index {clazz_i}")
-
-                res = DetectionResult(obj[0], obj[1], obj[2], obj[3], obj[4], clazz)
+                res = view.DetectionResult(
+                    obj[0], obj[1], obj[2], obj[3], obj[4], int(obj[5])
+                )
                 results.append(self._rescaled_result(res, orig_shape))
 
         return results
@@ -75,8 +70,8 @@ class ObjectDetector:
         return y
 
     def _rescaled_result(
-        self, res: "DetectionResult", orig_shape: "ImageShape"
-    ) -> "DetectionResult":
+        self, res: view.DetectionResult, orig_shape: "ImageShape"
+    ) -> view.DetectionResult:
         scale_x = orig_shape.width / self.img_shape.width
         scale_y = orig_shape.height / self.img_shape.height
 
@@ -87,16 +82,6 @@ class ObjectDetector:
             x2=res.x2 * scale_x,
             y2=res.y2 * scale_y,
         )
-
-
-@dataclasses.dataclass
-class DetectionResult:
-    x1: float
-    y1: float
-    x2: float
-    y2: float
-    score: float
-    clazz: str
 
 
 @dataclasses.dataclass
