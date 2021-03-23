@@ -35,6 +35,13 @@ class Convolutional(nn.Module):
 
         if section.activation == "leaky":
             module.add_module(f"leaky_{index}", nn.LeakyReLU(0.1))
+        elif section.activation == "linear":
+            # just return value as is
+            pass
+        else:
+            raise ValueError(
+                f"unknown convolutional activation function: {section.activation}"
+            )
 
         self.module = module
         self.batch_normalize = section.batch_normalize
