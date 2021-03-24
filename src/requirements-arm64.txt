@@ -1,0 +1,4 @@
+numpy==1.20.1
+opencv-python-headless==4.5.1.48
+https://github.com/N1cOs/python-wheels-arm64/raw/master/py3.8/torch-1.8.0-cp38-cp38-manylinux2014_aarch64.whl
+https://github.com/N1cOs/python-wheels-arm64/raw/master/py3.8/torchvision-0.9.0a0%2B01dfa8e-cp38-cp38-linux_aarch64.whl
