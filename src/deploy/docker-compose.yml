@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  scheduler:
+    image: ${DASK_SCHEDULER_IMAGE}
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+    command: >
+      dask-scheduler
+        --port 5000
+
+  worker:
+    image: ${DASK_WORKER_IMAGE}
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - "node.role==worker"
+    command: >
+      dask-worker scheduler:5000
