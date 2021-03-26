@@ -5,7 +5,6 @@ WORKDIR /app
 RUN apt-get update && \
     apt-get install \
         --yes \
-        --no-install-recommends \
             gcc
 
 COPY requirements.txt .
