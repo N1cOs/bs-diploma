@@ -14,3 +14,4 @@ tblib==1.7.0
 toolz==0.11.1
 tornado==6.1
 zict==2.0.0
+bokeh==2.3.0
