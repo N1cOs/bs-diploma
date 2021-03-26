@@ -3,6 +3,8 @@ version: "3.8"
 services:
   scheduler:
     image: ${DASK_SCHEDULER_IMAGE}
+    ports:
+    - "8787:8787"
     deploy:
       placement:
         constraints:
@@ -10,6 +12,7 @@ services:
     command: >
       dask-scheduler
         --port 5000
+        --dashboard-address :8787
 
   worker:
     image: ${DASK_WORKER_IMAGE}
@@ -20,3 +23,4 @@ services:
           - "node.role==worker"
     command: >
       dask-worker scheduler:5000
+        --no-dashboard
