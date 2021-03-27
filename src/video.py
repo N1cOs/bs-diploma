@@ -1,39 +1,11 @@
 import argparse
-import dataclasses
 import datetime
 import sys
 from os import path
 
 import cv2
 
-from lib import darknet, view
-
-
-@dataclasses.dataclass
-class VideoStat:
-    width: int
-    height: int
-    fps: float
-    frames: int
-    duration: float
-
-    @classmethod
-    def from_video_capture(cls, cap: cv2.VideoCapture):
-        fps = cap.get(cv2.CAP_PROP_FPS)
-        frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        return cls(
-            width=int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
-            height=int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)),
-            fps=fps,
-            frames=frames,
-            duration=frames / fps,
-        )
-
-    def __str__(self):
-        return (
-            f"video stats: resolution={self.width}x{self.height}, "
-            f"duration={self.duration:.2f}s, fps={self.fps:.2f}"
-        )
+from lib import darknet, view, video
 
 
 def print_progress(frames: int, all_frames: int, start: datetime.datetime):
@@ -72,7 +44,7 @@ if __name__ == "__main__":
     detection_writer = view.DetectionWriter(classes)
 
     cap = cv2.VideoCapture(args.in_video)
-    stats = VideoStat.from_video_capture(cap)
+    stats = video.VideoStat.from_video_capture(cap)
     print(stats)
 
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
