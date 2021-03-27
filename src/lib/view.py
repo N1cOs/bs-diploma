@@ -23,7 +23,7 @@ class DetectionWriter:
         self.classes = classes
         self.colors = [tuple(random.randint(0, 255) for _ in range(3)) for _ in classes]
 
-    def write_detection(self, img: np.ndarray, detection: DetectionResult):
+    def write(self, img: np.ndarray, detection: DetectionResult):
         try:
             color = self.colors[detection.clazz]
         except IndexError:
@@ -41,6 +41,4 @@ class AsyncDetectionWriter:
 
     async def write(self, img: np.ndarray, detection: DetectionResult):
         # ToDo: maybe use ProcessPoolExecutor for CPU bound task?
-        await self.loop.run_in_executor(
-            None, self.writer.write_detection, img, detection
-        )
+        await self.loop.run_in_executor(None, self.writer.write, img, detection)

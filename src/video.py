@@ -63,7 +63,7 @@ if __name__ == "__main__":
 
             detections = detector.detect(frame)
             for detection in detections:
-                detection_writer.write_detection(frame, detection)
+                detection_writer.write(frame, detection)
 
             writer.write(frame)
             frames += 1

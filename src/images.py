@@ -45,7 +45,7 @@ if __name__ == "__main__":
         print(f"{img_path}: inference time: {elapsed.microseconds / 1000}ms")
 
         for detection in detections:
-            writer.write_detection(img, detection)
+            writer.write(img, detection)
 
         img_path, ext = path.splitext(img_path)
         cv2.imwrite(f"{img_path}.out{ext}", img)
