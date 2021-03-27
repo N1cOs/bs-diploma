@@ -1,3 +1,4 @@
+import asyncio
 import dataclasses
 import random
 from typing import List
@@ -31,3 +32,15 @@ class DetectionWriter:
         p1 = (int(detection.x1), int(detection.y1))
         p2 = (int(detection.x2), int(detection.y2))
         cv2.rectangle(img, p1, p2, color, thickness=2)
+
+
+class AsyncDetectionWriter:
+    def __init__(self, classes: List[str]):
+        self.writer = DetectionWriter(classes)
+        self.loop = asyncio.get_running_loop()
+
+    async def write(self, img: np.ndarray, detection: DetectionResult):
+        # ToDo: maybe use ProcessPoolExecutor for CPU bound task?
+        await self.loop.run_in_executor(
+            None, self.writer.write_detection, img, detection
+        )
