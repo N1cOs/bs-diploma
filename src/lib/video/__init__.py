@@ -1,1 +1,1 @@
-from .reader import VideoStat
+from .reader import VideoStat, AsyncFrameReader
