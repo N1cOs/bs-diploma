@@ -7,11 +7,24 @@ build: build/worker build/client
 .PHONY: push
 push: push/worker push/client
 
+
+WORKER_CONFIG ?= yolov3.cfg
+WORKER_WEIGHTS ?= yolov3.weights
+
+CLIENT_CLASSES ?= coco.names
+CLIENT_VIDEO ?= video_720_15s.mp4
+
 .PHONY: deploy
 deploy:
-	docker stack deploy \
-		--prune \
-		--compose-file deploy/docker-compose.yml $(PROJECT)
+	WORKER_IMAGE=$(WORKER_IMAGE) \
+	WORKER_CONFIG=$(WORKER_CONFIG) \
+	WORKER_WEIGHTS=$(WORKER_WEIGHTS) \
+	CLIENT_IMAGE=$(CLIENT_IMAGE) \
+	CLIENT_CLASSES=$(CLIENT_CLASSES) \
+	CLIENT_VIDEO=$(CLIENT_VIDEO) \
+		docker stack deploy \
+			--prune \
+			--compose-file deploy/docker-compose.yml $(PROJECT)
 
 .PHONY: stop
 stop:
