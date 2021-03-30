@@ -1,6 +1,11 @@
 PROJECT = bs-diploma
 REGISTRY ?= master:5000
 
+.PHONY: build
+build: build/worker build/client
+
+.PHONY: push
+push: push/worker push/client
 
 .PHONY: deploy
 deploy:
@@ -33,6 +38,18 @@ build/worker:
 .PHONY: push/worker
 push/worker:
 	docker push $(WORKER_IMAGE)
+
+
+CLIENT_PATH = client
+CLIENT_IMAGE = $(REGISTRY)/$(PROJECT)-client
+
+.PHONY: build/client
+build/client:
+	docker build --tag $(CLIENT_IMAGE) $(CLIENT_PATH)
+
+.PHONY: push/client
+push/client:
+	docker push $(CLIENT_IMAGE)
 
 
 .PHONY: clean
