@@ -1,0 +1,11 @@
+FROM python:3.8-slim
+
+WORKDIR /app
+
+ARG REQUIREMENTS
+
+COPY $REQUIREMENTS .
+
+RUN pip install -r $REQUIREMENTS
+
+COPY . .
