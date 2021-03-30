@@ -32,7 +32,7 @@ services:
     volumes:
       - "/clusterfs/nkarmatskikh:/data"
     command: >
-      python run.py
+      ./run.sh python run.py
         --ventilator-addr client:5000
         --collector-addr client:5001
         --config /data/cfg/${WORKER_CONFIG}
