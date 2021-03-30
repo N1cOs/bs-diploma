@@ -1,17 +1,18 @@
 import argparse
-import datetime
 import sys
+import time
 from os import path
 
 import cv2
 
-from lib import darknet, view, video
+from client import video
+from worker import darknet
 
 
-def print_progress(frames: int, all_frames: int, start: datetime.datetime):
+def print_progress(frames: int, all_frames: int, start: float):
     percent = round((frames / all_frames) * 100, 2)
-    elapsed = datetime.datetime.now() - start
-    info = f"\rprogress: processed={percent}%, elapsed={elapsed.seconds}s"
+    elapsed = round(time.perf_counter() - start, 2)
+    info = f"\rprogress: processed={percent}%, elapsed={elapsed}s"
     sys.stdout.write(info)
     sys.stdout.flush()
 
@@ -41,7 +42,7 @@ if __name__ == "__main__":
             line = line.strip()
             if line:
                 classes.append(line)
-    detection_writer = view.DetectionWriter(classes)
+    detection_writer = video.DetectionWriter(classes)
 
     cap = cv2.VideoCapture(args.in_video)
     stats = video.VideoStat.from_video_capture(cap)
@@ -53,7 +54,7 @@ if __name__ == "__main__":
     )
 
     frames = 0
-    start_time = datetime.datetime.now()
+    start_time = time.perf_counter()
     try:
         while cap.isOpened():
             has_frame, frame = cap.read()
