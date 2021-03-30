@@ -1,26 +1,37 @@
 version: "3.8"
 
 services:
-  scheduler:
-    image: ${DASK_SCHEDULER_IMAGE}
-    ports:
-    - "8787:8787"
+  client:
+    image: ${CLIENT_IMAGE}
     deploy:
       placement:
         constraints:
           - "node.role==manager"
+    volumes:
+      - "/clusterfs/nkarmatskikh:/data"
     command: >
-      dask-scheduler
-        --port 5000
-        --dashboard-address :8787
+      python run.py
+        --classes /data/classes/${CLIENT_CLASSES}
+        --in-video /data/video/${CLIENT_VIDEO}
+        --ventilator-addr 0.0.0.0:5000
+        --collector-addr 0.0.0.0:5001
+        --read-buf-size 30
+        --write-buf-size 50
+        --frame-timeout-sec 5
+        --log-progress-percent 10
 
   worker:
-    image: ${DASK_WORKER_IMAGE}
+    image: ${WORKER_IMAGE}
     deploy:
       mode: global
       placement:
         constraints:
           - "node.role==worker"
+    volumes:
+      - "/clusterfs/nkarmatskikh:/data"
     command: >
-      dask-worker scheduler:5000
-        --no-dashboard
+      python run.py
+        --ventilator-addr client:5000
+        --collector-addr client:5001
+        --config /data/cfg/${WORKER_CONFIG}
+        --weights /data/weights/${WORKER_WEIGHTS}
