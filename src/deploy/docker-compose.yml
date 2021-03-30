@@ -19,7 +19,7 @@ services:
         --collector-addr 0.0.0.0:5001
         --read-buf-size 30
         --write-buf-size 50
-        --frame-timeout-sec 5
+        --frame-timeout-sec ${CLIENT_TIMEOUT_SEC}
         --log-progress-percent 10
 
   worker:
