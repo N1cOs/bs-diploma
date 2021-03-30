@@ -6,7 +6,6 @@ import torch
 from torchvision import ops
 from torchvision import transforms as tr
 
-from lib import view
 from . import network
 
 
@@ -19,7 +18,7 @@ class ObjectDetector:
 
     def detect(
         self, img: np.ndarray, conf_threshold: float = 0.5, iou_threshold: float = 0.4
-    ) -> List[view.DetectionResult]:
+    ) -> List["DetectionResult"]:
         transforms = tr.Compose(
             [
                 tr.ToTensor(),
@@ -53,7 +52,7 @@ class ObjectDetector:
 
             for obj in objects:
                 obj = [o.item() for o in obj]
-                res = view.DetectionResult(
+                res = DetectionResult(
                     obj[0], obj[1], obj[2], obj[3], obj[4], int(obj[5])
                 )
                 results.append(self._rescaled_result(res, orig_shape))
@@ -70,8 +69,8 @@ class ObjectDetector:
         return y
 
     def _rescaled_result(
-        self, res: view.DetectionResult, orig_shape: "ImageShape"
-    ) -> view.DetectionResult:
+        self, res: "DetectionResult", orig_shape: "ImageShape"
+    ) -> "DetectionResult":
         scale_x = orig_shape.width / self.img_shape.width
         scale_y = orig_shape.height / self.img_shape.height
 
@@ -99,3 +98,13 @@ class ImageShape:
 
     def hw_tuple(self) -> Tuple[int]:
         return tuple([self.height, self.width])
+
+
+@dataclasses.dataclass
+class DetectionResult:
+    x1: float
+    y1: float
+    x2: float
+    y2: float
+    score: float
+    clazz: int
