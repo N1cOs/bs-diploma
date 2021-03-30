@@ -1,17 +1,18 @@
 import argparse
-import datetime
 import glob
+import time
 from os import path
 
 import cv2
 
-from lib import darknet, view
+from client import video
+from worker import darknet
 
 if __name__ == "__main__":
     """
     Last results of median inference time:
         - YOLOv3-416
-            Laptop: > 600ms
+            Laptop: > 1100ms
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--config", default=path.join("data", "yolov3.cfg"))
@@ -32,17 +33,17 @@ if __name__ == "__main__":
             line = line.strip()
             if line:
                 classes.append(line)
-    writer = view.DetectionWriter(classes)
+    writer = video.DetectionWriter(classes)
 
     times = []
     for img_path in glob.glob(path.join(args.images_dir, "*.jpg")):
         img = cv2.imread(img_path)
-        start_time = datetime.datetime.now()
+        start_time = time.perf_counter()
         detections = detector.detect(img)
-        elapsed = datetime.datetime.now() - start_time
+        elapsed = round(time.perf_counter() - start_time, 2)
 
         times.append(elapsed)
-        print(f"{img_path}: inference time: {elapsed.microseconds / 1000}ms")
+        print(f"{img_path}: inference time: {elapsed}s")
 
         for detection in detections:
             writer.write(img, detection)
@@ -51,4 +52,4 @@ if __name__ == "__main__":
         cv2.imwrite(f"{img_path}.out{ext}", img)
 
     median = sorted(times)[len(times) // 2]
-    print(f"median inference time: {median.microseconds / 1000}ms")
+    print(f"median inference time: {median}s")
