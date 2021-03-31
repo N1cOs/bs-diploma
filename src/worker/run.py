@@ -3,6 +3,7 @@ import logging
 import sys
 import time
 
+import numpy as np
 import zmq
 
 import detector
@@ -29,6 +30,9 @@ if __name__ == "__main__":
     log.info(f"successfully started: args={args}")
 
     detector = detector.DarknetObjectDetector(args.config, args.weights)
+    # need kind of warming up
+    dummy_img = np.random.randint(0, 255, (1, 1, 3), dtype=np.uint8)
+    detector.detect(dummy_img)
     log.info("successfully loaded object detector")
 
     context = zmq.Context()
