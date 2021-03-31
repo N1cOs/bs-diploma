@@ -9,6 +9,6 @@ ARG REQUIREMENTS
 
 COPY $REQUIREMENTS .
 
-RUN pip install -r $REQUIREMENTS
+RUN pip install --no-cache-dir --requirement $REQUIREMENTS
 
 COPY . .
