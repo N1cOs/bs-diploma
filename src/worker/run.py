@@ -5,7 +5,7 @@ import time
 
 import zmq
 
-import darknet
+import detector
 import proto
 
 LOGGER_NAME = "worker"
@@ -28,9 +28,7 @@ if __name__ == "__main__":
     )
     log.info(f"successfully started: args={args}")
 
-    net = darknet.Network.from_config(args.config)
-    net.load_weights(args.weights)
-    detector = darknet.ObjectDetector(net)
+    detector = detector.DarknetObjectDetector(args.config, args.weights)
     log.info("successfully loaded object detector")
 
     context = zmq.Context()
