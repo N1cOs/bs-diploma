@@ -26,25 +26,44 @@ class AsyncFrameWriter:
 
 
 class DetectionWriter:
-    def __init__(self, classes: List[str]):
-        # ToDo: use class names
+    def __init__(self, classes: List[str], write_label: bool = True):
         self.classes = classes
         self.colors = [tuple(random.randint(0, 255) for _ in range(3)) for _ in classes]
+        self.write_label = write_label
 
     def write(self, img: np.ndarray, detection: "DetectionResult"):
         try:
             color = self.colors[detection.clazz]
+            label = self.classes[detection.clazz]
         except IndexError:
             raise ValueError(f"unknown detected class: index={detection.clazz}")
 
-        p1 = (int(detection.x1), int(detection.y1))
-        p2 = (int(detection.x2), int(detection.y2))
+        p1 = (detection.x1, detection.y1)
+        p2 = (detection.x2, detection.y2)
         cv2.rectangle(img, p1, p2, color, thickness=2)
+
+        if self.write_label:
+            label_size, base_line = cv2.getTextSize(
+                label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1
+            )
+            top = max(detection.y1, label_size[1])
+
+            p1 = (detection.x1, top - label_size[1])
+            p2 = (detection.x1 + label_size[0], top + base_line)
+            cv2.rectangle(img, p1, p2, color, cv2.FILLED)
+            cv2.putText(
+                img,
+                label,
+                (detection.x1, top),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                fontScale=0.5,
+                color=(0, 0, 0),
+            )
 
 
 class AsyncDetectionWriter:
-    def __init__(self, classes: List[str]):
-        self.writer = DetectionWriter(classes)
+    def __init__(self, classes: List[str], write_label: bool = True):
+        self.writer = DetectionWriter(classes, write_label)
         self.loop = asyncio.get_running_loop()
 
     async def write(self, img: np.ndarray, detection: "DetectionResult"):

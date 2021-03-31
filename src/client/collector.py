@@ -16,6 +16,7 @@ class DetectionCollector:
         max_rcv_buf: int,
         frame_timeout: int,
         classes: List[str],
+        write_label: bool,
         frame_dict: "AsyncDict",
         frame_writer: video.AsyncFrameWriter,
     ):
@@ -23,7 +24,7 @@ class DetectionCollector:
         self.max_rcv_buf = max_rcv_buf
         self.frame_timeout = frame_timeout
 
-        self.detection_writer = video.AsyncDetectionWriter(classes)
+        self.detection_writer = video.AsyncDetectionWriter(classes, write_label)
         self.frame_dict = frame_dict
         self.frame_writer = frame_writer
 

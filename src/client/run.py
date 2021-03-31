@@ -5,10 +5,10 @@ import os
 import sys
 import time
 
+import collector
 import zmq
 import zmq.asyncio
 
-import collector
 import proto
 import video
 
@@ -21,6 +21,7 @@ async def main():
     parser.add_argument("--classes", required=True)
     parser.add_argument("--in-video", required=True)
     parser.add_argument("--out-video", default="")
+    parser.add_argument("--write-label", type=bool, default=True)
     parser.add_argument("--read-buf-size", type=int, default=30)
     parser.add_argument("--write-buf-size", type=int, default=60)
     parser.add_argument("--frame-timeout-sec", type=int, default=5)
@@ -64,6 +65,7 @@ async def main():
         max_rcv_buf=args.write_buf_size,
         frame_timeout=args.frame_timeout_sec,
         classes=classes,
+        write_label=args.write_label,
         frame_dict=frames,
         frame_writer=frame_writer,
     )
