@@ -13,7 +13,7 @@ WORKER_WEIGHTS ?= yolov3.weights
 
 CLIENT_CLASSES ?= coco.names
 CLIENT_VIDEO ?= video_720_15s.mp4
-CLIENT_TIMEOUT_SEC ?= 5
+CLIENT_TIMEOUT_SEC ?= 10
 
 .PHONY: deploy
 deploy:
