@@ -6,7 +6,7 @@ from os import path
 import cv2
 
 from client import video
-from worker import darknet
+from worker import detector
 
 
 def print_progress(frames: int, all_frames: int, start: float):
@@ -31,10 +31,7 @@ if __name__ == "__main__":
         args.out_video = f"{path}.out{ext}"
 
     print(f"started with args: {args}")
-
-    net = darknet.Network.from_config(args.config)
-    net.load_weights(args.weights)
-    detector = darknet.ObjectDetector(net)
+    detector = detector.DarknetObjectDetector(args.config, args.weights)
 
     classes = []
     with open(args.classes, "r") as f:
