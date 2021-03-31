@@ -43,7 +43,7 @@ def parse_detect_response(data: bytes) -> DetectResponse:
 
 
 def _parse_detection(buf: io.BytesIO) -> video.DetectionResult:
-    x1, y1 = struct.unpack("!ff", buf.read(8))
-    x2, y2 = struct.unpack("!ff", buf.read(8))
+    x1, y1 = struct.unpack("!hh", buf.read(4))
+    x2, y2 = struct.unpack("!hh", buf.read(4))
     score, clazz = struct.unpack("!fh", buf.read(6))
     return video.DetectionResult(x1=x1, y1=y1, x2=x2, y2=y2, score=score, clazz=clazz)

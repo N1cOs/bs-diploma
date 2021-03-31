@@ -5,7 +5,7 @@ from typing import List
 
 import numpy as np
 
-import darknet
+import detector
 
 
 @dataclasses.dataclass
@@ -17,7 +17,7 @@ class DetectRequest:
 @dataclasses.dataclass
 class DetectResponse:
     id: int
-    detections: List[darknet.DetectionResult]
+    detections: List[detector.DetectionResult]
 
 
 def parse_detect_request(req: bytes) -> DetectRequest:
@@ -46,6 +46,7 @@ def dump_detect_response(resp: DetectResponse) -> bytes:
     return buf.getvalue()
 
 
-def _dump_detection(d: darknet.DetectionResult, buf: io.BytesIO):
-    buf.write(struct.pack("!" + "f" * 5, d.x1, d.y1, d.x2, d.y2, d.score))
+def _dump_detection(d: detector.DetectionResult, buf: io.BytesIO):
+    buf.write(struct.pack("!hhhh", d.x1, d.y1, d.x2, d.y2))
+    buf.write(struct.pack("!f", d.score))
     buf.write(struct.pack("!h", d.clazz))
