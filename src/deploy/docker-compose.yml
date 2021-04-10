@@ -37,3 +37,47 @@ services:
         --collector-addr client:5001
         --config /data/cfg/${WORKER_CONFIG}
         --weights /data/weights/${WORKER_WEIGHTS}
+
+  prometheus:
+    image: prom/prometheus:v2.26.0
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+      resources:
+        limits:
+          memory: 2048M
+        reservations:
+          memory: 128M
+    logging:
+      driver: local
+      options:
+        max-size: 5m
+        max-file: 3
+    expose:
+      - "9090"
+    ports:
+    - "9090:9090"
+
+  node-exporter:
+    image: prom/node-exporter:v1.1.2
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    deploy:
+      mode: global
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+    expose:
+      - "9100"
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
