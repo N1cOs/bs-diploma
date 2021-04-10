@@ -1,0 +1,23 @@
+%!TEX TS-program = xelatex
+
+\documentclass[xetex,a4paper,14pt]{extarticle}
+\input{preamble}
+
+\begin{document}
+	% страницы 1-2
+	% \includepdf{extra/title} % Титульный лист
+
+	% страницы 3-4
+	% \includepdf{extra/task} % Задание
+
+	% страницы 5-6
+	% \includepdf{extra/annotation} % Аннотация
+	
+	\tableofcontents
+	\clearpage
+
+	\input{include/0-intro} % Введение
+	\input{include/example} % Пока для примеров
+  \input{include/0-biblio} % Список источников
+
+\end{document}

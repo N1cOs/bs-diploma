@@ -1,0 +1,76 @@
+\usepackage{fontspec} % XeTeX
+\usepackage{xunicode} % Unicode для XeTeX
+\usepackage{pdfpages} % Вставка PDF
+
+% Шрифт
+\defaultfontfeatures{Ligatures=TeX}
+\setmainfont{Times New Roman}
+\newfontfamily\cyrillicfont{Times New Roman}
+
+% Русский язык
+\usepackage{polyglossia}
+\setdefaultlanguage{russian}
+
+\renewcommand{\baselinestretch}{1.5} % Межстрочный интервал
+\parindent 1.25cm % Абзацный отступ
+\hyphenpenalty=1000 % Частота переносов
+
+% Отступы у страниц
+\usepackage{geometry}
+\geometry{left=3cm}
+\geometry{right=1.5cm}
+\geometry{top=2cm}
+\geometry{bottom=2cm}
+
+% Подсчет количества страниц
+\usepackage{lastpage}
+\setcounter{page}{7}
+
+% Оформление оглавления
+\usepackage{tocloft}
+\renewcommand\cftsecleader{\cftdotfill{\cftdotsep}} % Точки для секций
+\renewcommand\cfttoctitlefont{\normalsize\bfseries\hspace{0.38\textwidth}\MakeTextUppercase} % Выравниваем название по центру и приводим в верхний регистр 
+\renewcommand\cftsecfont{\mdseries} % Названия разделов не жирные
+\renewcommand\cftsecpagefont{\mdseries} % Номера страниц не жирные
+\setcounter{tocdepth}{3} % Глубина оглавления до subsubsection
+
+% Заголовки секций в оглавлении в верхнем регистре
+\usepackage{textcase}
+\makeatletter
+\let\oldcontentsline\contentsline
+\def\contentsline#1#2{
+    \expandafter\ifx\csname l@#1\endcsname\l@section
+        \expandafter\@firstoftwo
+    \else
+        \expandafter\@secondoftwo
+    \fi
+    {\oldcontentsline{#1}{\MakeTextUppercase{#2}}}
+    {\oldcontentsline{#1}{#2}}
+}
+\makeatother
+
+% Оформление заголовков
+\usepackage[compact,explicit]{titlesec}
+\titleformat{\section}{\normalsize\bfseries}{}{1.25cm}{\thesection\hspace{.5em}\MakeTextUppercase{#1}}
+\titleformat{\subsection}[block]{\normalsize\bfseries}{}{1.25cm}{\thesubsection\hspace{.5em}#1}
+\titleformat{\subsubsection}[block]{}{}{1.25cm}{\thesubsubsection\hspace{.5em}#1}
+\titleformat{\paragraph}[block]{\normalsize\bfseries}{}{0em}{\MakeTextUppercase{#1}}
+
+\titlespacing{\subsection}{0pt}{.5em}{.25em}
+\titlespacing{\subsubsection}{0pt}{.5em}{0em}
+
+% Библиография
+\usepackage[numbers,colon]{natbib}
+\bibliographystyle{styles/utf8gost705u}
+\makeatletter
+\renewcommand{\@biblabel}[1]{#1.} % Меняем стиль нумерации '[1]' -> '1.'
+\renewcommand{\bibsection}{} % Удаляем наименование по умолчанию
+\makeatother
+
+
+% Секции без номеров (введение, заключение...)
+\newcommand{\anonsection}[1]{
+    \phantomsection % Корректный переход по ссылкам в содержании
+    \paragraph{\centerline{{#1}}}
+    \addcontentsline{toc}{section}{#1}
+}
