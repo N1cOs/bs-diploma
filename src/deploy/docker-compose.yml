@@ -38,6 +38,29 @@ services:
         --config /data/cfg/${WORKER_CONFIG}
         --weights /data/weights/${WORKER_WEIGHTS}
 
+  grafana:
+    image: grafana/grafana:7.5.3
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    logging:
+      driver: local
+      options:
+        max-size: 5m
+        max-file: 3
+    ports:
+      - 3000:3000
+
   prometheus:
     image: prom/prometheus:v2.26.0
     volumes:
@@ -58,8 +81,6 @@ services:
         max-file: 3
     expose:
       - "9090"
-    ports:
-    - "9090:9090"
 
   node-exporter:
     image: prom/node-exporter:v1.1.2
