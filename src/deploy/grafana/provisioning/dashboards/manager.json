@@ -15,7 +15,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 1,
   "links": [],
   "panels": [
     {
@@ -69,7 +69,7 @@
           "exemplar": true,
           "expr": "sum(irate(node_cpu_seconds_total{job=\"node-exporter-client\", mode!=\"idle\"}[1m]))",
           "interval": "",
-          "legendFormat": "CPU Usage",
+          "legendFormat": "CPU Used",
           "refId": "A"
         }
       ],
@@ -77,7 +77,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "CPU Used",
+      "title": "CPU Usage",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -211,7 +211,7 @@
       }
     }
   ],
-  "refresh": "5s",
+  "refresh": "",
   "schemaVersion": 27,
   "style": "dark",
   "tags": [],
