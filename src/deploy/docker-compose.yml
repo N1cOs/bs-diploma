@@ -92,9 +92,6 @@ services:
       - /:/rootfs:ro
     deploy:
       mode: global
-      placement:
-        constraints:
-          - "node.role==worker"
       resources:
         limits:
           memory: 128M
