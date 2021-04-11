@@ -3,9 +3,12 @@ global:
   evaluation_interval: 2s
 
 scrape_configs:
-  - job_name: 'node-exporter'
+  - job_name: 'node-exporter-worker'
     dns_sd_configs:
       - names:
-          - 'tasks.node-exporter'
+          - 'tasks.node-exporter-worker'
         type: 'A'
         port: 9100
+  - job_name: 'node-exporter-client'
+    static_configs:
+      - targets: ['node-exporter-client:9100']
