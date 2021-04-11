@@ -68,7 +68,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "count(node_uname_info)",
+          "expr": "count(node_uname_info{job=\"node-exporter-worker\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -127,7 +127,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "count(node_cpu_seconds_total{mode=\"idle\"})",
+          "expr": "count(node_cpu_seconds_total{mode=\"idle\",job=\"node-exporter-worker\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -187,7 +187,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "sum(node_memory_MemTotal_bytes)",
+          "expr": "sum(node_memory_MemTotal_bytes{job=\"node-exporter-worker\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -246,7 +246,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "avg(sum by(instance) (irate(node_cpu_seconds_total{mode!=\"idle\"}[1m])))",
+          "expr": "avg(sum by(instance) (irate(node_cpu_seconds_total{mode!=\"idle\", job=\"node-exporter-worker\"}[1m])))",
           "instant": false,
           "interval": "",
           "intervalFactor": 1,
@@ -345,7 +345,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "stddev(sum by(instance) (rate(node_cpu_seconds_total{mode!=\"idle\"}[1m]))) / avg(sum by(instance) (rate(node_cpu_seconds_total{mode!=\"idle\"}[1m])))",
+          "expr": "stddev(sum by(instance) (rate(node_cpu_seconds_total{mode!=\"idle\", job=\"node-exporter-worker\"}[1m]))) / avg(sum by(instance) (rate(node_cpu_seconds_total{mode!=\"idle\", job=\"node-exporter-worker\"}[1m])))",
           "interval": "",
           "legendFormat": "CV",
           "refId": "A"
@@ -441,7 +441,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "avg(node_memory_MemTotal_bytes-node_memory_MemFree_bytes)",
+          "expr": "avg(node_memory_MemTotal_bytes{job=\"node-exporter-worker\"}-node_memory_MemFree_bytes{job=\"node-exporter-worker\"})",
           "interval": "",
           "legendFormat": "Average",
           "refId": "A"
