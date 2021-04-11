@@ -40,13 +40,15 @@ services:
 
   grafana:
     image: grafana/grafana:7.5.3
+    volumes:
+    - ./grafana/provisioning:/etc/grafana/provisioning
     deploy:
       placement:
         constraints:
           - "node.role==manager"
       resources:
         limits:
-          memory: 128M
+          memory: 256M
         reservations:
           memory: 64M
     environment:
@@ -90,6 +92,9 @@ services:
       - /:/rootfs:ro
     deploy:
       mode: global
+      placement:
+        constraints:
+          - "node.role==worker"
       resources:
         limits:
           memory: 128M
