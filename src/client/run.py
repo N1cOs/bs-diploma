@@ -27,6 +27,8 @@ async def main():
     parser.add_argument("--frame-timeout-sec", type=int, default=5)
     parser.add_argument("--ventilator-addr", default="0.0.0.0:5000")
     parser.add_argument("--collector-addr", default="0.0.0.0:5001")
+    # ToDo: replace to aiohttp: need to set up monitoring services
+    parser.add_argument("--startup-wait-sec", type=int, default=30)
     parser.add_argument("--log-level", default="INFO")
     parser.add_argument("--log-progress-percent", type=int, default=10)
     args = parser.parse_args()
@@ -42,6 +44,7 @@ async def main():
         stream=sys.stdout,
     )
     log.info(f"started: args={args}")
+    time.sleep(args.startup_wait_sec)
 
     classes = []
     with open(args.classes, "r") as f:
