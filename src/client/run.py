@@ -108,7 +108,9 @@ async def main():
     await write_task
 
     elapsed = round(time.perf_counter() - start, 2)
-    log.info(f"processed whole video: elapsed={elapsed}s")
+    log.info(
+        f"processed whole video: elapsed={elapsed}s, dropped frames={writer.dropped_frames}"
+    )
 
 
 async def send_frame(sock, id_, frame, log):

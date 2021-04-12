@@ -28,9 +28,14 @@ class DetectionCollector:
         self.frame_dict = frame_dict
         self.frame_writer = frame_writer
 
+        self._dropped = 0
         self._write_queue = asyncio.Queue()
         self._stopping = asyncio.Event()
         self._log = logging.getLogger(__name__)
+
+    @property
+    def dropped_frames(self):
+        return self._dropped
 
     def start(self) -> asyncio.Task:
         write_task = asyncio.create_task(self._write_detections(), name="write_task")
@@ -60,6 +65,7 @@ class DetectionCollector:
 
                 if resp.id <= last_written:
                     self._log.warning(f"{name}: dropping frame: id={resp.id}")
+                    self._dropped += 1
                     continue
 
                 heapq.heappush(pq, resp)
