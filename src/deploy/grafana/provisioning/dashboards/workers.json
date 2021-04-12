@@ -15,7 +15,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 2,
   "links": [],
   "panels": [
     {
@@ -441,7 +441,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "avg(node_memory_MemTotal_bytes{job=\"node-exporter-worker\"}-node_memory_MemFree_bytes{job=\"node-exporter-worker\"})",
+          "expr": "avg(node_memory_MemTotal_bytes{job=\"node-exporter-worker\"}-node_memory_MemFree_bytes{job=\"node-exporter-worker\"}-node_memory_Cached_bytes{job=\"node-exporter-worker\"} - node_memory_Buffers_bytes{job=\"node-exporter-worker\"} - node_memory_Slab_bytes{job=\"node-exporter-worker\"})",
           "interval": "",
           "legendFormat": "Average",
           "refId": "A"
