@@ -114,3 +114,12 @@
     \paragraph{\centerline{{#1}}}
     \addcontentsline{toc}{section}{#1}
 }
+
+% Добавление рисунка 
+\newcommand{\addimg}[4]{ 
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=#2\linewidth]{#1}
+        \caption{#3} \label{#4}
+    \end{figure}
+}
