@@ -23,7 +23,7 @@ prep:
 
 
 HUN_SPELL_DICTS := en_US,ru_RU
-HUN_SPELL_IGNORED_FILES = 'preamble|example'
+HUN_SPELL_IGNORED_FILES = 'preamble'
 
 .PHONY: check
 spellcheck:
