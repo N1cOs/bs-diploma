@@ -29,7 +29,8 @@ HUN_SPELL_IGNORED_FILES = 'preamble'
 spellcheck:
 	@find . -name '*.tex' | \
 	grep --invert-match --extended-regexp $(HUN_SPELL_IGNORED_FILES) | \
-	xargs hunspell -d $(HUN_SPELL_DICTS) -l -t
+	xargs hunspell -d $(HUN_SPELL_DICTS) -l -t | \
+	sort --unique
 
 
 .PHONY: clean
