@@ -11,8 +11,9 @@ venv/
 .vscode
 .idea/
 
-# NN Weights
+# NN config and weights
 *.weights
+*.cfg
 
 # Out files
 *.out.*

@@ -70,3 +70,4 @@ push/client:
 .PHONY: clean
 clean:
 	find . -name *.out.* | xargs --no-run-if-empty rm
+	find . -regextype posix-extended -regex '.+\.(cfg|weights)' | xargs --no-run-if-empty rm
