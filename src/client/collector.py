@@ -121,6 +121,7 @@ class DetectionCollector:
                         res = write_task.result()
                         await write(res)
                     elif wait_task in done:
+                        self._log.info(f"{name}: got stopping signal")
                         await write_until_empty(self._write_queue)
                         break
                     else:
