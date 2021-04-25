@@ -97,10 +97,14 @@ class DetectionCollector:
         self._log.info(f"{name}: started")
 
         async def write(res):
+            self._log.debug(f"{name}: writing detections")
             frame, detections = res
             for d in detections:
                 await self.detection_writer.write(frame, d)
+            self._log.debug(f"{name}: wrote detections")
+
             await self.frame_writer.write(frame)
+            self._log.debug(f"{name}: wrote frame with detections")
 
         async def write_until_empty(q):
             while not q.empty():
