@@ -15,5 +15,8 @@ venv/
 *.weights
 *.cfg
 
+# Videos
+*.mp4
+
 # Out files
 *.out.*
