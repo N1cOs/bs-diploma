@@ -59,6 +59,22 @@
 \titlespacing{\subsection}{0pt}{.5em}{.25em}
 \titlespacing{\subsubsection}{0pt}{.5em}{0em}
 
+% Изображения
+\usepackage{graphicx}
+\graphicspath{{images/}} % Путь до директории с изображениями
+\renewcommand{\thefigure}{\thesection.\arabic{figure}} % Формат именования рисунков: секция.номер
+\addto\captionsrussian{\renewcommand{\figurename}{Рисунок}}
+
+\usepackage{caption}
+\DeclareCaptionLabelSeparator{hyphen}{ -- }
+\captionsetup[figure]{justification=centering, labelsep=hyphen, format=plain} 
+
+% Списки
+\usepackage{enumerate}
+\usepackage{enumitem}
+\setlist{nolistsep} % Убираем лишний отступ между соседними пунктами списка
+\setlist[enumerate]{label=\arabic*)} % Устанавливаем формат пункта в списке '1)'
+
 % Библиография
 \usepackage[numbers,colon]{natbib}
 \bibliographystyle{styles/utf8gost705u}
