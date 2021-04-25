@@ -30,15 +30,15 @@ services:
       restart_policy:
         condition: none
     volumes:
-      - "/clusterfs/nkarmatskikh:/data"
+      - "/home/rock64/Documents/nkarmatskikh/data:/data"
     command: >
       python run.py
         --classes /data/classes/${CLIENT_CLASSES}
         --in-video /data/video/${CLIENT_VIDEO}
         --ventilator-addr 0.0.0.0:5000
         --collector-addr 0.0.0.0:5001
-        --read-buf-size 25
-        --write-buf-size 50
+        --read-buf-size 50
+        --write-buf-size 65
         --frame-timeout-sec ${CLIENT_TIMEOUT_SEC}
         --log-progress-percent 10
 
