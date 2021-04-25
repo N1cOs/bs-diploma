@@ -8,8 +8,8 @@ build: build/worker build/client
 push: push/worker push/client
 
 
-WORKER_CONFIG ?= yolov3.cfg
-WORKER_WEIGHTS ?= yolov3.weights
+WORKER_CONFIG ?= yolov4-tiny.cfg
+WORKER_WEIGHTS ?= yolov4-tiny.weights
 
 CLIENT_CLASSES ?= coco.names
 CLIENT_VIDEO ?= video_720_15s.mp4
