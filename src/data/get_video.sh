@@ -10,6 +10,9 @@ case $1 in
   hd-15s-30fps)
     wget 'https://drive.google.com/uc?id=18GOLI8xSDIv_RsHDOChobsh3YF1Pl5EP&export=download' -O "$1".mp4
     ;;
+  hd-30s-30fps)
+    wget 'https://drive.google.com/uc?id=1haSyjEmrPf-iaFY8dooU0cv_UdtFALLU&export=download' -O "$1".mp4
+    ;;
   hd-60s-30fps)
     wget 'https://drive.google.com/uc?id=1VbeRKJHbsUVbFcT9Rzz0CuqFvYZD5RBd&export=download' -O "$1".mp4
     ;;
