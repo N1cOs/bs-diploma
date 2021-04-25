@@ -219,14 +219,15 @@
       "hiddenSeries": false,
       "id": 8,
       "legend": {
-        "avg": false,
+        "avg": true,
         "current": false,
         "hideEmpty": false,
         "max": false,
         "min": false,
+        "rightSide": false,
         "show": true,
         "total": false,
-        "values": false
+        "values": true
       },
       "lines": true,
       "linewidth": 1,
@@ -415,13 +416,13 @@
       "hiddenSeries": false,
       "id": 12,
       "legend": {
-        "avg": false,
+        "avg": true,
         "current": false,
         "max": false,
         "min": false,
         "show": true,
         "total": false,
-        "values": false
+        "values": true
       },
       "lines": true,
       "linewidth": 1,
