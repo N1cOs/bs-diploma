@@ -13,7 +13,8 @@ class DetectionCollector:
     def __init__(
         self,
         sock: zmq.Socket,
-        max_rcv_buf: int,
+        recv_buf_size: int,
+        write_buf_size: int,
         frame_timeout: int,
         classes: List[str],
         write_label: bool,
@@ -21,7 +22,7 @@ class DetectionCollector:
         frame_writer: video.AsyncFrameWriter,
     ):
         self.sock = sock
-        self.max_rcv_buf = max_rcv_buf
+        self.recv_buf_size = recv_buf_size
         self.frame_timeout = frame_timeout
 
         self.detection_writer = video.AsyncDetectionWriter(classes, write_label)
@@ -29,7 +30,7 @@ class DetectionCollector:
         self.frame_writer = frame_writer
 
         self._dropped = 0
-        self._write_queue = asyncio.Queue()
+        self._write_queue = asyncio.Queue(maxsize=write_buf_size)
         self._stopping = asyncio.Event()
         self._log = logging.getLogger(__name__)
 
@@ -75,7 +76,7 @@ class DetectionCollector:
                     await write_head()
                     last_written += 1
 
-                if len(pq) > self.max_rcv_buf:
+                if len(pq) > self.recv_buf_size:
                     # write nearest frame which we already received
                     id_ = await write_head()
                     last_written = id_

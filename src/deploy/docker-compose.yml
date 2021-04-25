@@ -38,7 +38,8 @@ services:
         --ventilator-addr 0.0.0.0:5000
         --collector-addr 0.0.0.0:5001
         --read-buf-size 50
-        --write-buf-size 65
+        --recv-buf-size 65
+        --write-buf-size 130
         --frame-timeout-sec ${CLIENT_TIMEOUT_SEC}
         --log-progress-percent 10
 

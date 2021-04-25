@@ -23,7 +23,8 @@ async def main():
     parser.add_argument("--out-video", default="")
     parser.add_argument("--write-label", type=bool, default=True)
     parser.add_argument("--read-buf-size", type=int, default=30)
-    parser.add_argument("--write-buf-size", type=int, default=60)
+    parser.add_argument("--recv-buf-size", type=int, default=60)
+    parser.add_argument("--write-buf-size", type=int, default=100)
     parser.add_argument("--frame-timeout-sec", type=int, default=5)
     parser.add_argument("--ventilator-addr", default="0.0.0.0:5000")
     parser.add_argument("--collector-addr", default="0.0.0.0:5001")
@@ -65,7 +66,8 @@ async def main():
 
     writer = collector.DetectionCollector(
         sock=collect_sock,
-        max_rcv_buf=args.write_buf_size,
+        recv_buf_size=args.recv_buf_size,
+        write_buf_size=args.write_buf_size,
         frame_timeout=args.frame_timeout_sec,
         classes=classes,
         write_label=args.write_label,
