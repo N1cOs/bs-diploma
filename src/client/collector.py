@@ -1,6 +1,7 @@
 import asyncio
 import heapq
 import logging
+import time
 from typing import List
 
 import zmq
@@ -45,6 +46,7 @@ class DetectionCollector:
     async def _poll_detections(self, write_task: asyncio.Task):
         name = asyncio.current_task().get_name()
         self._log.info(f"{name}: started")
+        start_time = time.perf_counter()
 
         pq = []
         frames = {}
@@ -81,7 +83,11 @@ class DetectionCollector:
                     id_ = await write_head()
                     last_written = id_
             except asyncio.TimeoutError:
-                self._log.info(f"{name}: got frame timeout, stopping")
+                elapsed = time.perf_counter() - start_time
+                elapsed = round(elapsed - self.frame_timeout, 2)
+                self._log.info(
+                    f"{name}: got frame timeout, stopping: processing time={elapsed}s"
+                )
                 self._stopping.set()
                 await write_task
                 break
