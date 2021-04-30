@@ -54,8 +54,6 @@ services:
           - "node.role==worker"
     volumes:
       - "/clusterfs/nkarmatskikh:/data"
-    environment:
-      ENABLE_CPU_CLUSTERING: 1
     command: >
       python run.py
         --ventilator-addr client:5000
