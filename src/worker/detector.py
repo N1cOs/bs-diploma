@@ -1,5 +1,6 @@
 import dataclasses
-from typing import List, Dict
+import re
+from typing import List, Dict, Tuple
 
 import cv2
 import numpy as np
@@ -29,15 +30,21 @@ class DarknetObjectDetector:
     def __init__(self, cfg: str, weights: str, target: int):
         net = cv2.dnn.readNetFromDarknet(cfg, weights)
         net.setPreferableTarget(target)
+
         self._net = net
+        self._size = self._parse_net_size(cfg)
         self._out_names = net.getUnconnectedOutLayersNames()
 
     def detect(
         self, img: np.ndarray, conf_threshold: float = 0.5, nms_threshold: float = 0.4
     ) -> List["DetectionResult"]:
-        # ToDo: use size from config
         blob = cv2.dnn.blobFromImage(
-            img, self._SCALE_FACTOR, (416, 416), self._RGB_MEAN, swapRB=True, crop=False
+            img,
+            self._SCALE_FACTOR,
+            self._size,
+            self._RGB_MEAN,
+            swapRB=True,
+            crop=False,
         )
         self._net.setInput(blob)
         outs = self._net.forward(self._out_names)
@@ -90,6 +97,45 @@ class DarknetObjectDetector:
             results.append(res)
 
         return results
+
+    @staticmethod
+    def _parse_net_size(cfg_path: str) -> Tuple[int, int]:
+        with open(cfg_path, "r") as cfg:
+            raw_sections = []
+
+            section = {}
+            header_re = re.compile(r"^\[(?P<name>\w+)\]$")
+            for line in cfg:
+                if line.startswith("#") or line.isspace():
+                    continue
+
+                match = header_re.match(line)
+                if match:
+                    if section:
+                        raw_sections.append(section)
+                    section = {"type": match.group("name")}
+                else:
+                    key, val = [s.strip() for s in line.split("=")]
+                    if key in section:
+                        raise ValueError(
+                            f"duplicate section key: section={section['type']}, key={key}"
+                        )
+                    section[key] = val
+            raw_sections.append(section)
+
+        for raw in raw_sections:
+            type_ = raw["type"]
+            if type_ == "net":
+                width = raw.get("width")
+                if width is None:
+                    raise ValueError(f"missing width in net section: {cfg_path}")
+
+                height = raw.get("height")
+                if height is None:
+                    raise ValueError(f"missing height in net section: {cfg_path}")
+
+                return int(width), int(height)
+        raise ValueError(f"missing net section: {cfg_path}")
 
 
 @dataclasses.dataclass
