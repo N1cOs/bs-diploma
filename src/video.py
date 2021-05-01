@@ -22,7 +22,7 @@ if __name__ == "__main__":
     parser.add_argument("-c", "--config", default=path.join("data", "yolov4-tiny.cfg"))
     parser.add_argument("-w", "--weights", default=path.join("data", "yolov4-tiny.weights"))
     parser.add_argument("-l", "--classes", default=path.join("data", "coco.names"))
-    parser.add_argument("-i", "--in-video", default=path.join("data", "video_15s.mp4"))
+    parser.add_argument("-i", "--in-video", default=path.join("data", "hd-15s-30fps.mp4"))
     parser.add_argument("-o", "--out-video", default="")
     args = parser.parse_args()
 
