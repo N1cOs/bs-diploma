@@ -12,11 +12,14 @@ LOGGER_NAME = "worker"
 LOG_FORMAT = "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s"
 
 if __name__ == "__main__":
+    targets = detector.get_available_targets()
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--ventilator-addr", required=True)
     parser.add_argument("--collector-addr", required=True)
     parser.add_argument("--config", required=True)
     parser.add_argument("--weights", required=True)
+    parser.add_argument("--target", choices=list(targets), default="cpu")
     parser.add_argument("--log-level", default="INFO")
     args = parser.parse_args()
 
@@ -28,7 +31,11 @@ if __name__ == "__main__":
     )
     log.info(f"successfully started: args={args}")
 
-    detector = detector.DarknetObjectDetector(args.config, args.weights)
+    detector = detector.DarknetObjectDetector(
+        args.config,
+        args.weights,
+        targets[args.target],
+    )
     log.info("successfully loaded object detector")
 
     context = zmq.Context()

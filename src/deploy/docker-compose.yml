@@ -60,6 +60,7 @@ services:
         --collector-addr client:5001
         --config /data/cfg/${WORKER_CONFIG}
         --weights /data/weights/${WORKER_WEIGHTS}
+        --target ${WORKER_TARGET}
 
   grafana:
     image: grafana/grafana:7.5.3

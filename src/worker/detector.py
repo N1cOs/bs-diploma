@@ -1,16 +1,34 @@
 import dataclasses
-from typing import List
+from typing import List, Dict
 
 import cv2
 import numpy as np
+
+TARGET_MAPPING = {
+    cv2.dnn.DNN_TARGET_CPU: "cpu",
+    cv2.dnn.DNN_TARGET_OPENCL: "opencl",
+    cv2.dnn.DNN_TARGET_OPENCL_FP16: "opencl_fp16",
+}
+
+
+def get_available_targets() -> Dict[str, int]:
+    targets = {}
+    for target in cv2.dnn.getAvailableTargets(cv2.dnn.DNN_BACKEND_DEFAULT):
+        val = target[0]
+        key = TARGET_MAPPING.get(val)
+        if key is None:
+            raise ValueError(f"unknown target: {val}")
+        targets[key] = val
+    return targets
 
 
 class DarknetObjectDetector:
     _SCALE_FACTOR = 0.00392
     _RGB_MEAN = (0, 0, 0)
 
-    def __init__(self, cfg: str, weights: str):
+    def __init__(self, cfg: str, weights: str, target: int):
         net = cv2.dnn.readNetFromDarknet(cfg, weights)
+        net.setPreferableTarget(target)
         self._net = net
         self._out_names = net.getUnconnectedOutLayersNames()
 

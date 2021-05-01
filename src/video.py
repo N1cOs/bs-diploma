@@ -18,11 +18,18 @@ def print_progress(frames: int, all_frames: int, start: float):
 
 
 if __name__ == "__main__":
+    targets = detector.get_available_targets()
+
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--config", default=path.join("data", "yolov4-tiny.cfg"))
-    parser.add_argument("-w", "--weights", default=path.join("data", "yolov4-tiny.weights"))
+    parser.add_argument(
+        "-w", "--weights", default=path.join("data", "yolov4-tiny.weights")
+    )
     parser.add_argument("-l", "--classes", default=path.join("data", "coco.names"))
-    parser.add_argument("-i", "--in-video", default=path.join("data", "hd-15s-30fps.mp4"))
+    parser.add_argument("-t", "--target", choices=list(targets), default="cpu")
+    parser.add_argument(
+        "-i", "--in-video", default=path.join("data", "hd-15s-30fps.mp4")
+    )
     parser.add_argument("-o", "--out-video", default="")
     args = parser.parse_args()
 
@@ -31,7 +38,11 @@ if __name__ == "__main__":
         args.out_video = f"{path}.out{ext}"
 
     print(f"started with args: {args}")
-    detector = detector.DarknetObjectDetector(args.config, args.weights)
+    detector = detector.DarknetObjectDetector(
+        args.config,
+        args.weights,
+        targets[args.target],
+    )
 
     classes = []
     with open(args.classes, "r") as f:

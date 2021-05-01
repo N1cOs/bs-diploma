@@ -9,21 +9,25 @@ from client import video
 from worker import detector
 
 if __name__ == "__main__":
-    """
-    Last results of median inference time:
-        - YOLOv3-416
-            Laptop: > 600ms
-    """
+    targets = detector.get_available_targets()
+
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--config", default=path.join("data", "yolov4-tiny.cfg"))
-    parser.add_argument("-w", "--weights", default=path.join("data", "yolov4-tiny.weights"))
+    parser.add_argument(
+        "-w", "--weights", default=path.join("data", "yolov4-tiny.weights")
+    )
     parser.add_argument("-l", "--classes", default=path.join("data", "coco.names"))
+    parser.add_argument("-t", "--target", choices=list(targets), default="cpu")
     parser.add_argument("-i", "--images-dir", default=path.join("data", "images"))
 
     args = parser.parse_args()
     print(f"started with args: {args}")
 
-    detector = detector.DarknetObjectDetector(args.config, args.weights)
+    detector = detector.DarknetObjectDetector(
+        args.config,
+        args.weights,
+        targets[args.target],
+    )
 
     classes = []
     with open(args.classes, "r") as f:
