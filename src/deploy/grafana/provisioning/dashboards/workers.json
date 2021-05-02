@@ -222,8 +222,8 @@
         "avg": true,
         "current": false,
         "hideEmpty": false,
-        "max": false,
-        "min": false,
+        "max": true,
+        "min": true,
         "rightSide": false,
         "show": true,
         "total": false,
@@ -320,13 +320,13 @@
       "hiddenSeries": false,
       "id": 10,
       "legend": {
-        "avg": false,
+        "avg": true,
         "current": false,
-        "max": false,
-        "min": false,
+        "max": true,
+        "min": true,
         "show": true,
         "total": false,
-        "values": false
+        "values": true
       },
       "lines": true,
       "linewidth": 1,
@@ -418,8 +418,8 @@
       "legend": {
         "avg": true,
         "current": false,
-        "max": false,
-        "min": false,
+        "max": true,
+        "min": true,
         "show": true,
         "total": false,
         "values": true
