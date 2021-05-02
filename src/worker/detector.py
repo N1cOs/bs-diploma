@@ -27,13 +27,18 @@ class DarknetObjectDetector:
     _SCALE_FACTOR = 0.00392
     _RGB_MEAN = (0, 0, 0)
 
-    def __init__(self, cfg: str, weights: str, target: int):
+    def __init__(self, cfg: str, weights: str, target: int, warm_up: bool = True):
         net = cv2.dnn.readNetFromDarknet(cfg, weights)
         net.setPreferableTarget(target)
 
         self._net = net
         self._size = self._parse_net_size(cfg)
         self._out_names = net.getUnconnectedOutLayersNames()
+
+        if warm_up:
+            shape = self._size + (3,)
+            dummy_img = np.random.randint(0, 255, shape, dtype=np.uint8)
+            self.detect(dummy_img)
 
     def detect(
         self, img: np.ndarray, conf_threshold: float = 0.5, nms_threshold: float = 0.4
