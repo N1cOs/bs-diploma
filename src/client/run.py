@@ -5,11 +5,12 @@ import os
 import sys
 import time
 
-import collector
 import zmq
 import zmq.asyncio
 
+import collector
 import proto
+import stats
 import video
 
 LOGGER_NAME = "client"
@@ -26,11 +27,12 @@ async def main():
     parser.add_argument("--recv-buf-size", type=int, default=60)
     parser.add_argument("--write-buf-size", type=int, default=100)
     parser.add_argument("--frame-timeout-sec", type=int, default=5)
-    parser.add_argument("--ventilator-addr", default="0.0.0.0:5000")
+    parser.add_argument("--ventilator-addr", default="0.0.0.0:5002")
     parser.add_argument("--collector-addr", default="0.0.0.0:5001")
     # ToDo: replace to aiohttp: need to set up monitoring services
     parser.add_argument("--startup-wait-sec", type=int, default=30)
     parser.add_argument("--log-level", default="INFO")
+    parser.add_argument("--log-stats", action="store_true")
     parser.add_argument("--log-progress-percent", type=int, default=10)
     args = parser.parse_args()
 
@@ -64,6 +66,7 @@ async def main():
     collect_sock = ctx.socket(zmq.PULL)
     collect_sock.bind(f"tcp://{args.collector_addr}")
 
+    stats_collector = stats.FrameEventsCollector(args.log_stats)
     writer = collector.DetectionCollector(
         sock=collect_sock,
         recv_buf_size=args.recv_buf_size,
@@ -73,6 +76,7 @@ async def main():
         write_label=args.write_label,
         frame_dict=frames,
         frame_writer=frame_writer,
+        stats_ctl=stats_collector,
     )
 
     vent_sock = ctx.socket(zmq.PUSH)
@@ -86,8 +90,8 @@ async def main():
         if not has_frame:
             return
 
-        await frames.put(id_, frame)
         await send_frame(vent_sock, id_, frame, log)
+        await frames.put(id_, collector.Frame(frame, time.perf_counter()))
         write_task = writer.start()
 
         log_step = args.log_progress_percent / 100
@@ -100,14 +104,17 @@ async def main():
                 log.info(f"progress: sent={sent}%,elapsed={elapsed}s")
                 next_log += log_step
 
+            now = time.perf_counter()
             has_frame, frame = await reader.read()
             if not has_frame:
                 break
+            await stats_collector.send_decode_duration(time.perf_counter() - now)
 
-            await frames.put(id_, frame)
             await send_frame(vent_sock, id_, frame, log)
+            await frames.put(id_, collector.Frame(frame, time.perf_counter()))
 
     await write_task
+    await stats_collector.stop()
 
     elapsed = round(time.perf_counter() - start, 2)
     log.info(

@@ -1,12 +1,15 @@
 import asyncio
+import dataclasses
 import heapq
 import logging
 import time
 from typing import List
 
+import numpy as np
 import zmq
 
 import proto
+import stats
 import video
 
 
@@ -21,6 +24,7 @@ class DetectionCollector:
         write_label: bool,
         frame_dict: "AsyncDict",
         frame_writer: video.AsyncFrameWriter,
+        stats_ctl: stats.FrameEventsCollector,
     ):
         self.sock = sock
         self.recv_buf_size = recv_buf_size
@@ -29,6 +33,7 @@ class DetectionCollector:
         self.detection_writer = video.AsyncDetectionWriter(classes, write_label)
         self.frame_dict = frame_dict
         self.frame_writer = frame_writer
+        self.stats_ctl = stats_ctl
 
         self._dropped = 0
         self._write_queue = asyncio.Queue(maxsize=write_buf_size)
@@ -55,7 +60,7 @@ class DetectionCollector:
             head = heapq.heappop(pq)
             frame = frames.pop(head.id)
             self._log.debug(f"{name}: writing frame: id={head.id}")
-            await self._write_queue.put((frame, head.detections))
+            await self._write_queue.put((frame.data, head.detections))
             return head.id
 
         last_written = -1
@@ -65,6 +70,10 @@ class DetectionCollector:
                 resp = proto.parse_detect_response(raw_resp)
                 frame = await self.frame_dict.pop(resp.id)
                 self._log.debug(f"{name}: received frame: id={resp.id}")
+                await self.stats_ctl.send_transfer_duration(
+                    time.perf_counter() - frame.sent_time - resp.elapsed_sec,
+                )
+                await self.stats_ctl.send_detect_duration(resp.elapsed_sec)
 
                 if resp.id <= last_written:
                     self._log.warning(f"{name}: dropping frame: id={resp.id}")
@@ -104,14 +113,17 @@ class DetectionCollector:
         self._log.info(f"{name}: started")
 
         async def write(res):
-            self._log.debug(f"{name}: writing detections")
             frame, detections = res
+            now = time.perf_counter()
             for d in detections:
                 await self.detection_writer.write(frame, d)
-            self._log.debug(f"{name}: wrote detections")
+            await self.stats_ctl.send_write_detections_duration(
+                time.perf_counter() - now
+            )
 
+            now = time.perf_counter()
             await self.frame_writer.write(frame)
-            self._log.debug(f"{name}: wrote frame with detections")
+            await self.stats_ctl.send_encode_duration(time.perf_counter() - now)
 
         async def write_until_empty(q):
             while not q.empty():
@@ -147,6 +159,12 @@ class DetectionCollector:
                     self._log.error(f"{name}: unhandled exception", exc_info=True)
 
         self._log.info(f"{name}: finished")
+
+
+@dataclasses.dataclass
+class Frame:
+    data: np.ndarray
+    sent_time: float
 
 
 class AsyncDict:
