@@ -3,9 +3,9 @@ import logging
 import sys
 import time
 
+import detector
 import zmq
 
-import detector
 import proto
 
 LOGGER_NAME = "worker"
@@ -53,8 +53,8 @@ if __name__ == "__main__":
         start = time.perf_counter()
         detections = detector.detect(req.img)
 
-        elapsed = round(time.perf_counter() - start, 2)
-        log.debug(f"processed image: id={req.id}, elapsed={elapsed}s")
+        elapsed = time.perf_counter() - start
+        log.debug(f"processed image: id={req.id}, elapsed={round(elapsed, 2)}s")
 
-        resp = proto.DetectResponse(req.id, detections)
+        resp = proto.DetectResponse(req.id, elapsed, detections)
         collect_socket.send(proto.dump_detect_response(resp))

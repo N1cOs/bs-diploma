@@ -19,6 +19,7 @@ class DetectRequest:
 @dataclasses.dataclass
 class DetectResponse:
     id: int
+    elapsed_sec: float
     detections: Tuple[video.DetectionResult]
 
     def __lt__(self, other):
@@ -38,8 +39,10 @@ def dump_detect_request(req: DetectRequest) -> bytes:
 
 def parse_detect_response(data: bytes) -> DetectResponse:
     buf = io.BytesIO(data)
-    id_, len_ = struct.unpack("!Ih", buf.read(6))
-    return DetectResponse(id_, tuple(_parse_detection(buf) for _ in range(len_)))
+    id_, elapsed, len_ = struct.unpack("!Ifh", buf.read(10))
+    return DetectResponse(
+        id_, elapsed, tuple(_parse_detection(buf) for _ in range(len_))
+    )
 
 
 def _parse_detection(buf: io.BytesIO) -> video.DetectionResult:

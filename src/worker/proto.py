@@ -3,9 +3,8 @@ import io
 import struct
 from typing import List
 
-import numpy as np
-
 import detector
+import numpy as np
 
 
 @dataclasses.dataclass
@@ -17,6 +16,7 @@ class DetectRequest:
 @dataclasses.dataclass
 class DetectResponse:
     id: int
+    elapsed_sec: float
     detections: List[detector.DetectionResult]
 
 
@@ -37,7 +37,7 @@ def parse_detect_request(req: bytes) -> DetectRequest:
 
 def dump_detect_response(resp: DetectResponse) -> bytes:
     buf = io.BytesIO()
-    buf.write(struct.pack("!I", resp.id))
+    buf.write(struct.pack("!If", resp.id, resp.elapsed_sec))
 
     detections = resp.detections
     buf.write(struct.pack("!h", len(detections)))
