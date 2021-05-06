@@ -26,14 +26,14 @@ class DetectionCollector:
         frame_writer: video.AsyncFrameWriter,
         stats_ctl: stats.FrameEventsCollector,
     ):
-        self.sock = sock
-        self.recv_buf_size = recv_buf_size
-        self.frame_timeout = frame_timeout
+        self._sock = sock
+        self._recv_max_size = recv_buf_size
+        self._frame_timeout = frame_timeout
 
-        self.detection_writer = video.AsyncDetectionWriter(classes, write_label)
-        self.frame_dict = frame_dict
-        self.frame_writer = frame_writer
-        self.stats_ctl = stats_ctl
+        self._detection_writer = video.AsyncDetectionWriter(classes, write_label)
+        self._frame_dict = frame_dict
+        self._frame_writer = frame_writer
+        self._stats_ctl = stats_ctl
 
         self._dropped = 0
         self._write_queue = asyncio.Queue(maxsize=write_buf_size)
@@ -63,37 +63,50 @@ class DetectionCollector:
             await self._write_queue.put((frame.data, head.detections))
             return head.id
 
+        def check_drops(cur, prev):
+            if cur != prev + 1:
+                dropped = [i for i in range(prev + 1, cur)]
+                self._log.warning(f"{name}: dropping frame: ids={dropped}")
+                self._dropped += len(dropped)
+
         last_written = -1
         while True:
             try:
-                raw_resp = await asyncio.wait_for(self.sock.recv(), self.frame_timeout)
+                raw_resp = await asyncio.wait_for(
+                    self._sock.recv(), self._frame_timeout
+                )
                 resp = proto.parse_detect_response(raw_resp)
-                frame = await self.frame_dict.pop(resp.id)
+                frame = await self._frame_dict.pop(resp.id)
                 self._log.debug(f"{name}: received frame: id={resp.id}")
-                await self.stats_ctl.send_transfer_duration(
+                await self._stats_ctl.send_transfer_duration(
                     time.perf_counter() - frame.sent_time - resp.elapsed_sec,
                 )
-                await self.stats_ctl.send_detect_duration(resp.elapsed_sec)
+                await self._stats_ctl.send_detect_duration(resp.elapsed_sec)
 
                 if resp.id <= last_written:
-                    self._log.warning(f"{name}: dropping frame: id={resp.id}")
-                    self._dropped += 1
+                    # just drop received frame
                     continue
 
                 heapq.heappush(pq, resp)
                 frames[resp.id] = frame
 
-                while pq and pq[0].id - 1 == last_written:
+                while pq and pq[0].id == last_written + 1:
                     await write_head()
                     last_written += 1
 
-                if len(pq) > self.recv_buf_size:
+                if len(pq) > self._recv_max_size:
                     # write nearest frame which we already received
                     id_ = await write_head()
+                    check_drops(id_, last_written)
                     last_written = id_
             except asyncio.TimeoutError:
+                while pq:
+                    id_ = await write_head()
+                    check_drops(id_, last_written)
+                    last_written = id_
+
                 elapsed = time.perf_counter() - start_time
-                elapsed = round(elapsed - self.frame_timeout, 2)
+                elapsed = round(elapsed - self._frame_timeout, 2)
                 self._log.info(
                     f"{name}: got frame timeout, stopping: processing time={elapsed}s"
                 )
@@ -116,14 +129,14 @@ class DetectionCollector:
             frame, detections = res
             now = time.perf_counter()
             for d in detections:
-                await self.detection_writer.write(frame, d)
-            await self.stats_ctl.send_write_detections_duration(
+                await self._detection_writer.write(frame, d)
+            await self._stats_ctl.send_write_detections_duration(
                 time.perf_counter() - now
             )
 
             now = time.perf_counter()
-            await self.frame_writer.write(frame)
-            await self.stats_ctl.send_encode_duration(time.perf_counter() - now)
+            await self._frame_writer.write(frame)
+            await self._stats_ctl.send_encode_duration(time.perf_counter() - now)
 
         async def write_until_empty(q):
             while not q.empty():
@@ -131,7 +144,7 @@ class DetectionCollector:
                 await write(res)
 
         wait_task = asyncio.create_task(self._stopping.wait())
-        async with self.frame_writer:
+        async with self._frame_writer:
             while True:
                 try:
                     write_task = asyncio.create_task(self._write_queue.get())
