@@ -78,9 +78,6 @@ class DetectionCollector:
                 resp = proto.parse_detect_response(raw_resp)
                 frame = await self._frame_dict.pop(resp.id)
                 self._log.debug(f"{name}: received frame: id={resp.id}")
-                await self._stats_ctl.send_transfer_duration(
-                    time.perf_counter() - frame.sent_time - resp.elapsed_sec,
-                )
                 await self._stats_ctl.send_detect_duration(resp.elapsed_sec)
 
                 if resp.id <= last_written:

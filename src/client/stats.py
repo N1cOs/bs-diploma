@@ -12,14 +12,12 @@ class Event:
 class FrameEventsCollector:
     DECODE_EVENT = 0
     DETECT_EVENT = 1
-    TRANSFER_EVENT = 2
-    DETECTION_WRITE_EVENT = 3
-    ENCODE_EVENT = 4
+    DETECTION_WRITE_EVENT = 2
+    ENCODE_EVENT = 3
 
     EVENTS_NAME = [
         "decode",
         "detect",
-        "transfer",
         "detection_write",
         "encode",
     ]
@@ -35,16 +33,13 @@ class FrameEventsCollector:
             self._log.propagate = False
 
         self._stopping = asyncio.Event()
-        self._task = asyncio.create_task(self._read_loop(), name="stats")
+        self._task = asyncio.create_task(self._read_loop(), name="read_loop")
 
     async def send_decode_duration(self, seconds: float):
         await self._queue.put(Event(self.DECODE_EVENT, seconds))
 
     async def send_detect_duration(self, seconds: float):
         await self._queue.put(Event(self.DETECT_EVENT, seconds))
-
-    async def send_transfer_duration(self, seconds: float):
-        await self._queue.put(Event(self.TRANSFER_EVENT, seconds))
 
     async def send_write_detections_duration(self, seconds: float):
         await self._queue.put(Event(self.DETECTION_WRITE_EVENT, seconds))
