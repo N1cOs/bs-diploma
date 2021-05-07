@@ -120,8 +120,10 @@ async def main():
     await stats_collector.stop()
 
     elapsed = round(time.perf_counter() - start, 2)
+    fps = round(id_ / elapsed, 2)
     log.info(
-        f"processed whole video: elapsed={elapsed}s, dropped frames={writer.dropped_frames}"
+        f"processed whole video: elapsed={elapsed}s, fps={fps}, "
+        f"dropped frames={writer.dropped_frames}"
     )
 
 
