@@ -66,10 +66,12 @@ async def main():
     collect_sock = ctx.socket(zmq.PULL)
     collect_sock.bind(f"tcp://{args.collector_addr}")
 
+    read_all = asyncio.Event()
     stats_collector = stats.FrameEventsCollector(args.log_stats)
     writer = collector.DetectionCollector(
         sock=collect_sock,
         read_buf=read_buf,
+        read_all=read_all,
         recv_buf_size=args.recv_buf_size,
         write_buf_size=args.write_buf_size,
         frame_timeout=args.frame_timeout_sec,
@@ -113,6 +115,7 @@ async def main():
             await read_buf.put(id_, frame)
             await send_frame(vent_sock, id_, frame, log)
 
+    read_all.set()
     await write_task
     await stats_collector.stop()
 

@@ -16,6 +16,7 @@ class DetectionCollector:
         self,
         sock: zmq.Socket,
         read_buf: "AsyncDict",
+        read_all: asyncio.Event,
         recv_buf_size: int,
         write_buf_size: int,
         frame_timeout: int,
@@ -26,6 +27,7 @@ class DetectionCollector:
     ):
         self._sock = sock
         self._read_buf = read_buf
+        self._read_all = read_all
         self._recv_max_size = recv_buf_size
         self._frame_timeout = frame_timeout
 
@@ -97,6 +99,10 @@ class DetectionCollector:
                     await check_drops(id_, last_written)
                     last_written = id_
             except asyncio.TimeoutError:
+                if not self._read_all.is_set():
+                    self._log.warning(f"{name}: got frame timeout")
+                    continue
+
                 while pq:
                     id_ = await write_head()
                     await check_drops(id_, last_written)
@@ -105,8 +111,9 @@ class DetectionCollector:
                 elapsed = time.perf_counter() - start_time
                 elapsed = round(elapsed - self._frame_timeout, 2)
                 self._log.info(
-                    f"{name}: got frame timeout, stopping: processing time={elapsed}s"
+                    f"{name}: process all frames, stopping: processing time={elapsed}s"
                 )
+
                 self._stopping.set()
                 await write_task
                 break
