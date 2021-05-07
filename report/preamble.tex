@@ -26,6 +26,10 @@
 \usepackage{lastpage}
 \setcounter{page}{7}
 
+% Сбрасываем счетчик таблиц и рисунков в каждой новой главе
+\counterwithin{figure}{section}
+\counterwithin{table}{section}
+
 % Оформление оглавления
 \usepackage{tocloft}
 \renewcommand\cftsecleader{\cftdotfill{\cftdotsep}} % Точки для секций
@@ -82,7 +86,6 @@
 \renewcommand{\@biblabel}[1]{#1.} % Меняем стиль нумерации '[1]' -> '1.'
 \renewcommand{\bibsection}{} % Удаляем наименование по умолчанию
 \makeatother
-
 
 % Секции без номеров (введение, заключение...)
 \newcommand{\anonsection}[1]{
