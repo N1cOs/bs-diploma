@@ -90,6 +90,24 @@
 \renewcommand{\bibsection}{} % Удаляем наименование по умолчанию
 \makeatother
 
+% Оформление исходного кода
+\usepackage{listings}
+\setmonofont{FreeMono} % Шрифт для листингов
+\lstset{
+    basicstyle=\small\ttfamily,
+    breaklines=true,
+    tabsize=2,
+    frame=single,
+    numbers=left,
+}
+\DeclareCaptionFormat{listing}{
+\parbox{\textwidth}{#1#2#3}
+}
+\captionsetup[lstlisting]{
+    format=listing,
+    skip=7pt
+}
+
 % Секции без номеров (введение, заключение...)
 \newcommand{\anonsection}[1]{
     \phantomsection % Корректный переход по ссылкам в содержании
