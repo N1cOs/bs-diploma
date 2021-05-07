@@ -56,7 +56,7 @@ async def main():
             if line:
                 classes.append(line)
 
-    frames = collector.AsyncDict(args.read_buf_size)
+    read_buf = collector.AsyncDict(args.read_buf_size)
     frame_reader = video.AsyncFrameReader(args.in_video)
     video_stat = frame_reader.video_stat
     frame_writer = video.AsyncFrameWriter(args.out_video, "mp4v", video_stat)
@@ -69,12 +69,12 @@ async def main():
     stats_collector = stats.FrameEventsCollector(args.log_stats)
     writer = collector.DetectionCollector(
         sock=collect_sock,
+        read_buf=read_buf,
         recv_buf_size=args.recv_buf_size,
         write_buf_size=args.write_buf_size,
         frame_timeout=args.frame_timeout_sec,
         classes=classes,
         write_label=args.write_label,
-        frame_dict=frames,
         frame_writer=frame_writer,
         stats_ctl=stats_collector,
     )
@@ -90,7 +90,7 @@ async def main():
         if not has_frame:
             return
 
-        await frames.put(id_, frame)
+        await read_buf.put(id_, frame)
         await send_frame(vent_sock, id_, frame, log)
         write_task = writer.start()
 
@@ -110,7 +110,7 @@ async def main():
                 break
             await stats_collector.send_decode_duration(time.perf_counter() - now)
 
-            await frames.put(id_, frame)
+            await read_buf.put(id_, frame)
             await send_frame(vent_sock, id_, frame, log)
 
     await write_task

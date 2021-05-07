@@ -15,21 +15,21 @@ class DetectionCollector:
     def __init__(
         self,
         sock: zmq.Socket,
+        read_buf: "AsyncDict",
         recv_buf_size: int,
         write_buf_size: int,
         frame_timeout: int,
         classes: List[str],
         write_label: bool,
-        frame_dict: "AsyncDict",
         frame_writer: video.AsyncFrameWriter,
         stats_ctl: stats.FrameEventsCollector,
     ):
         self._sock = sock
+        self._read_buf = read_buf
         self._recv_max_size = recv_buf_size
         self._frame_timeout = frame_timeout
 
         self._detection_writer = video.AsyncDetectionWriter(classes, write_label)
-        self._frame_dict = frame_dict
         self._frame_writer = frame_writer
         self._stats_ctl = stats_ctl
 
@@ -61,9 +61,12 @@ class DetectionCollector:
             await self._write_queue.put((frame, head.detections))
             return head.id
 
-        def check_drops(cur, prev):
+        async def check_drops(cur, prev):
             if cur != prev + 1:
                 dropped = [i for i in range(prev + 1, cur)]
+                for i in dropped:
+                    await self._read_buf.pop(i)
+
                 self._log.warning(f"{name}: dropping frame: ids={dropped}")
                 self._dropped += len(dropped)
 
@@ -74,7 +77,6 @@ class DetectionCollector:
                     self._sock.recv(), self._frame_timeout
                 )
                 resp = proto.parse_detect_response(raw_resp)
-                frame = await self._frame_dict.pop(resp.id)
                 self._log.debug(f"{name}: received frame: id={resp.id}")
                 await self._stats_ctl.send_detect_duration(resp.elapsed_sec)
 
@@ -83,7 +85,7 @@ class DetectionCollector:
                     continue
 
                 heapq.heappush(pq, resp)
-                frames[resp.id] = frame
+                frames[resp.id] = await self._read_buf.pop(resp.id)
 
                 while pq and pq[0].id == last_written + 1:
                     await write_head()
@@ -92,12 +94,12 @@ class DetectionCollector:
                 if len(pq) > self._recv_max_size:
                     # write nearest frame which we already received
                     id_ = await write_head()
-                    check_drops(id_, last_written)
+                    await check_drops(id_, last_written)
                     last_written = id_
             except asyncio.TimeoutError:
                 while pq:
                     id_ = await write_head()
-                    check_drops(id_, last_written)
+                    await check_drops(id_, last_written)
                     last_written = id_
 
                 elapsed = time.perf_counter() - start_time
