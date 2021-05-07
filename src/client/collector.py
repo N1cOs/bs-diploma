@@ -1,11 +1,9 @@
 import asyncio
-import dataclasses
 import heapq
 import logging
 import time
 from typing import List
 
-import numpy as np
 import zmq
 
 import proto
@@ -60,7 +58,7 @@ class DetectionCollector:
             head = heapq.heappop(pq)
             frame = frames.pop(head.id)
             self._log.debug(f"{name}: writing frame: id={head.id}")
-            await self._write_queue.put((frame.data, head.detections))
+            await self._write_queue.put((frame, head.detections))
             return head.id
 
         def check_drops(cur, prev):
@@ -169,12 +167,6 @@ class DetectionCollector:
                     self._log.error(f"{name}: unhandled exception", exc_info=True)
 
         self._log.info(f"{name}: finished")
-
-
-@dataclasses.dataclass
-class Frame:
-    data: np.ndarray
-    sent_time: float
 
 
 class AsyncDict:

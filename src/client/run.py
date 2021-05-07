@@ -90,8 +90,8 @@ async def main():
         if not has_frame:
             return
 
+        await frames.put(id_, frame)
         await send_frame(vent_sock, id_, frame, log)
-        await frames.put(id_, collector.Frame(frame, time.perf_counter()))
         write_task = writer.start()
 
         log_step = args.log_progress_percent / 100
@@ -110,8 +110,8 @@ async def main():
                 break
             await stats_collector.send_decode_duration(time.perf_counter() - now)
 
+            await frames.put(id_, frame)
             await send_frame(vent_sock, id_, frame, log)
-            await frames.put(id_, collector.Frame(frame, time.perf_counter()))
 
     await write_task
     await stats_collector.stop()
