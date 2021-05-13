@@ -12,7 +12,8 @@ from worker import detector
 def print_progress(frames: int, all_frames: int, start: float):
     percent = round((frames / all_frames) * 100, 2)
     elapsed = round(time.perf_counter() - start, 2)
-    info = f"\rprogress: processed={percent}%, elapsed={elapsed}s"
+    fps = round(frames / elapsed, 2)
+    info = f"\rprogress: processed={percent}%, fps={fps}, elapsed={elapsed}s"
     sys.stdout.write(info)
     sys.stdout.flush()
 
