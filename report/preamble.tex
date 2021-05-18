@@ -20,6 +20,7 @@
 
 % Отступы у страниц
 \usepackage{geometry}
+\usepackage{chngpage}
 \geometry{left=3cm}
 \geometry{right=1.5cm}
 \geometry{top=2cm}
@@ -72,9 +73,19 @@
 \renewcommand{\thefigure}{\thesection.\arabic{figure}} % Формат именования рисунков: секция.номер
 \addto\captionsrussian{\renewcommand{\figurename}{Рисунок}}
 
+% Таблицы
+\usepackage{multirow}
+\usepackage{float}
+
+% Формулы
+\usepackage{mathtools,unicode-math}
+\numberwithin{equation}{section}
+
+% Заголовки
 \usepackage{caption}
 \DeclareCaptionLabelSeparator{hyphen}{ -- }
 \captionsetup[figure]{justification=centering, labelsep=hyphen, format=plain} 
+\captionsetup[table]{labelsep=hyphen, format=plain, singlelinecheck=false, skip=5pt} 
 
 % Списки
 \usepackage{enumerate}
