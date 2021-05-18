@@ -19,7 +19,7 @@ prep:
 	# install TimesNewRoman
 	sudo apt install ttf-mscorefonts-installer
 	# install hunspell with russian dictionary
-	sudo apt install hunspell hunspell-ru
+	sudo apt install hunspell hunspell-en-us hunspell-ru
 
 
 HUN_SPELL_DICTS := en_US,ru_RU
