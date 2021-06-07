@@ -2,9 +2,9 @@
 
 ## Description
 Repository contains my bachelor's final qualifying work at ITMO University. The work was about development of a distributed algorithm for object detection in video. Used technologies:
-* asyncio
-* OpenCV (with Tengine)
-* ZeroMQ
+* asyncio;
+* OpenCV (with Tengine);
+* ZeroMQ.
 
 https://user-images.githubusercontent.com/38363125/120944162-ad55a080-c73b-11eb-9120-7774d1460842.mp4
 
