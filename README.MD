@@ -1,7 +1,7 @@
-# Bachelor's final qualifying work
+# Bachelor's Thesis
 
 ## Description
-Repository contains my bachelor's final qualifying work at ITMO University. The work was about development of a distributed algorithm for object detection in video. Used technologies:
+Repository contains my bachelor's thesis at ITMO University. The paper was about development of a distributed algorithm for object detection in videos. Used technologies:
 * asyncio;
 * OpenCV (with Tengine);
 * ZeroMQ.
